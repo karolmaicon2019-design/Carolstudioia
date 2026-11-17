@@ -8,7 +8,7 @@ assert.match(home,/id="ai-messages"/);assert.match(home,/id="ai-scope-summary"/)
 assert.match(chat,/projectSummary/);assert.match(chat,/carol:project-brief/);
 assert.match(admin,/id="dashboard"/);assert.match(portal,/id="projects"/);assert.match(portal,/\/api\/client\/projects/);assert.match(server,/\/api\/admin\/client-access/);assert.match(admin,/id="status-filter"/);
 assert.match(server,/\/api\/leads/);assert.match(server,/\/api\/admin\/leads/);assert.match(server,/Cache-Control/);
-assert.match(server,/const bearer=/);assert.ok(server.includes('match(/^Bearer\\s+(.+)$/i)'), 'Bearer token parsing must use whitespace regex');assert.match(server,/\/api\/client\/projects/);
+assert.match(server,/const bearer=/);assert.ok(server.includes('match(/^Bearer\\s+(.+)$/i)'), 'Bearer token parsing must use whitespace regex');assert.match(server,/\/api\/client\/projects/);assert.match(server,/\/api\/admin\/project-updates/);assert.match(portal,/Andamento do projeto/);assert.match(admin,/id="new-update"/);
 for(const p of ['index.html','admin.html','cliente.html','carol-ia.js','welcome-intro.js','robots.txt','sitemap.xml'])assert.ok(existsSync(new URL('../'+p,import.meta.url)),p+' missing');
 for(const p of ['index.html','admin.html','cliente.html','carol-ia.js','robots.txt','sitemap.xml'])assert.ok(vercel.builds.some(b=>b.src===p),p+' missing in build');
 const inline=[...home.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(m=>m[1]).filter(x=>!x.trim().startsWith('{'));
