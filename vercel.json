@@ -22,7 +22,7 @@
       "use": "@vercel/static"
     },
     {
-      "src": "welcome-voice.js",
+      "src": "welcome-intro.js",
       "use": "@vercel/static"
     },
     {
