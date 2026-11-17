@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://carolstudioia.vercel.app/sitemap.xml
