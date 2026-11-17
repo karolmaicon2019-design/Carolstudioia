@@ -37,7 +37,7 @@ app.get('/api/client/projects',adminLimit,clientAuth,async(req,res)=>{
  if(!links?.length)return res.json({projects:[]});
  const {data,error}=await supabase.from('carol_leads').select('id,protocol,servico,ideia,status,preco_final,resposta,created_at').in('id',links.map(x=>x.lead_id)).order('created_at',{ascending:false});
  if(error)return fail(res,'Não foi possível carregar seus projetos.',500);
- return res.json({projects:data||[]});
+ const {data:updates,error:updatesError}=await supabase.from('carol_project_updates').select('id,lead_id,title,description,stage,created_at').in('lead_id',links.map(x=>x.lead_id)).eq('visible_to_client',true).order('created_at',{ascending:false}).limit(200);if(updatesError)return fail(res,'Não foi possível consultar as atualizações.',500);return res.json({projects:(data||[]).map(p=>({...p,updates:(updates||[]).filter(u=>u.lead_id===p.id)}))});
 });
 app.post('/api/admin/client-access',adminLimit,admin,async(req,res)=>{
  const userId=clean(req.body?.user_id,36),leadId=clean(req.body?.lead_id,36);
@@ -52,6 +52,21 @@ app.post('/api/admin/client-access',adminLimit,admin,async(req,res)=>{
  const {error}=await supabase.from('carol_client_access').upsert({user_id:userId,lead_id:leadId},{onConflict:'user_id,lead_id'});
  if(error)return fail(res,'Não foi possível autorizar o acesso.',500);
  return res.status(201).json({linked:true});
+});
+app.post('/api/admin/project-updates',adminLimit,admin,async(req,res)=>{
+ const lead_id=clean(req.body?.lead_id,36),title=clean(req.body?.title,120),description=clean(req.body?.description,1500),stage=clean(req.body?.stage,32);
+ const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+ if(!uuid.test(lead_id)||!title||!['planejamento','design','desenvolvimento','revisao','entrega'].includes(stage))return fail(res,'Dados da atualização inválidos.',400);
+ const {data,error}=await supabase.from('carol_project_updates').insert({lead_id,title,description,stage,visible_to_client:req.body?.visible_to_client===true}).select('id').single();
+ if(error)return fail(res,'Não foi possível salvar a atualização.',500);
+ return res.status(201).json({id:data.id});
+});
+app.patch('/api/admin/project-updates/:id',adminLimit,admin,async(req,res)=>{
+ const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+ if(!uuid.test(req.params.id)||typeof req.body?.visible_to_client!=='boolean')return fail(res,'Dados inválidos.',400);
+ const {data,error}=await supabase.from('carol_project_updates').update({visible_to_client:req.body.visible_to_client}).eq('id',req.params.id).select('id').maybeSingle();
+ if(error||!data)return fail(res,'Atualização não encontrada.',404);
+ return res.json({updated:true});
 });
 app.delete('/api/admin/client-access',adminLimit,admin,async(req,res)=>{
  const userId=clean(req.body?.user_id,36),leadId=clean(req.body?.lead_id,36);
