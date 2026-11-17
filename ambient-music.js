@@ -1,93 +1,88 @@
-/* Carol Digital Studio: trilha original, suave e sem osciladores contínuos. */
+/* Trilha ambiente original e relaxante: acordes macios, notas espaçadas e volume discreto. */
 (() => {
   const button = document.getElementById('ambient-toggle');
   if (!button) return;
   const AudioCtx = window.AudioContext || window.webkitAudioContext;
   if (!AudioCtx) { button.hidden = true; return; }
 
-  let ctx = null, master = null, timer = null, active = false, index = 0, generation = 0;
-  // Pequena progressão harmônica original: notas curtas, graves e macias.
-  const sequence = [
-    [196, 261.63], [246.94], [293.66], [261.63],
-    [174.61, 220], [261.63], [293.66], [220],
-    [164.81, 196], [246.94], [261.63], [196],
-    [174.61, 261.63], [220], [196], [146.83]
+  let ctx, master, filter, interval, playing = false, step = 0;
+  const pattern = [
+    [130.81, 196.00, 261.63], [164.81, 196.00],
+    [146.83, 220.00, 293.66], [174.61, 220.00],
+    [110.00, 164.81, 220.00], [146.83, 196.00],
+    [130.81, 196.00, 246.94], [164.81, 220.00]
   ];
 
-  function label() {
-    button.setAttribute('aria-pressed', String(active));
-    button.setAttribute('aria-label', active ? 'Desligar música ambiente' : 'Ligar música ambiente');
-    button.textContent = active ? '♫ Música: ligada' : '♫ Ativar música';
+  function updateButton() {
+    button.setAttribute('aria-pressed', String(playing));
+    button.setAttribute('aria-label', playing ? 'Desligar música ambiente' : 'Ligar música ambiente');
+    button.textContent = playing ? '♫ Música: ligada' : '♫ Ativar música';
   }
-  function setup() {
+  function initialize() {
     ctx = new AudioCtx();
     master = ctx.createGain();
-    master.gain.value = 0.32;
-    const filter = ctx.createBiquadFilter();
+    master.gain.value = 0.18;
+    filter = ctx.createBiquadFilter();
     filter.type = 'lowpass';
-    filter.frequency.value = 850;
-    filter.Q.value = 0.25;
+    filter.frequency.value = 520;
+    filter.Q.value = 0.2;
     filter.connect(master);
     master.connect(ctx.destination);
-    return filter;
   }
-  let filter;
-  function note(freq, when, duration, strength) {
-    if (!ctx) return;
-    const oscillator = ctx.createOscillator();
+  function softTone(frequency, time, length, peak) {
+    const osc = ctx.createOscillator();
     const envelope = ctx.createGain();
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(freq, when);
-    envelope.gain.setValueAtTime(0.0001, when);
-    envelope.gain.exponentialRampToValueAtTime(strength, when + 0.12);
-    envelope.gain.exponentialRampToValueAtTime(0.0001, when + duration);
-    oscillator.connect(envelope);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(frequency, time);
+    envelope.gain.setValueAtTime(0.0001, time);
+    envelope.gain.linearRampToValueAtTime(peak, time + 0.65);
+    envelope.gain.exponentialRampToValueAtTime(0.0001, time + length);
+    osc.connect(envelope);
     envelope.connect(filter);
-    oscillator.start(when);
-    oscillator.stop(when + duration + 0.03);
-    oscillator.onended = () => { oscillator.disconnect(); envelope.disconnect(); };
+    osc.start(time);
+    osc.stop(time + length + 0.05);
+    osc.onended = () => { osc.disconnect(); envelope.disconnect(); };
   }
-  function playStep() {
-    if (!active || !ctx || ctx.state !== 'running') return;
-    const now = ctx.currentTime + 0.025;
-    const pitches = sequence[index % sequence.length];
-    pitches.forEach((freq, i) => note(freq, now + i * 0.22, 1.65, i === 0 ? 0.075 : 0.035));
-    index += 1;
+  function nextPhrase() {
+    if (!playing || !ctx || ctx.state !== 'running') return;
+    const notes = pattern[step++ % pattern.length];
+    const time = ctx.currentTime + 0.05;
+    notes.forEach((frequency, i) => softTone(frequency, time + i * 0.85, 4.3, i === 0 ? 0.095 : 0.055));
   }
-  async function toggle() {
+  button.addEventListener('click', async () => {
     button.disabled = true;
-    const request = ++generation;
     try {
-      if (active) {
-        active = false;
-        clearInterval(timer);
-        timer = null;
+      if (playing) {
+        playing = false;
+        clearInterval(interval);
+        interval = undefined;
         if (ctx && ctx.state === 'running') await ctx.suspend();
       } else {
-        if (!ctx) filter = setup();
-        await ctx.resume(); // Inicia apenas após toque do visitante.
-        if (request !== generation) return;
-        active = true;
-        playStep();
-        timer = setInterval(playStep, 2000);
+        if (!ctx) initialize();
+        await ctx.resume();
+        playing = true;
+        nextPhrase();
+        interval = setInterval(nextPhrase, 6300);
       }
-    } catch (e) {
-      active = false;
-      clearInterval(timer);
-      timer = null;
-      console.warn('Música ambiente indisponível:', e);
-    } finally { label(); button.disabled = false; }
-  }
-  button.addEventListener('click', toggle);
+    } catch (error) {
+      playing = false;
+      clearInterval(interval);
+      interval = undefined;
+      console.warn('Música ambiente indisponível:', error);
+    } finally {
+      updateButton();
+      button.disabled = false;
+    }
+  });
   document.addEventListener('visibilitychange', () => {
-    if (!ctx || !active) return;
+    if (!ctx || !playing) return;
     if (document.hidden) ctx.suspend().catch(() => {});
     else ctx.resume().catch(() => {});
   });
   window.addEventListener('pagehide', () => {
-    active = false;
-    clearInterval(timer);
+    playing = false;
+    clearInterval(interval);
     if (ctx) ctx.close().catch(() => {});
   }, {once:true});
-  label();
+  updateButton();
 })();
