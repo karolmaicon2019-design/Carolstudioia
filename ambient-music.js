@@ -1,69 +1,93 @@
-/* Trilha ambiente original sintetizada no navegador; nenhuma faixa externa. */
+/* Carol Digital Studio: trilha original, suave e sem osciladores contínuos. */
 (() => {
   const button = document.getElementById('ambient-toggle');
   if (!button) return;
-  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-  if (!AudioContextClass) { button.hidden = true; return; }
-  let ctx, master, voices = [], timer, playing = false, step = 0;
-  const chords = [[130.81,164.81,196],[146.83,174.61,220],[110,146.83,174.61],[130.81,164.81,220]];
-  function setLabel() {
-    button.setAttribute('aria-pressed', String(playing));
-    button.setAttribute('aria-label', playing ? 'Desligar música ambiente' : 'Ligar música ambiente');
-    button.textContent = playing ? '♫ Música: ligada' : '♫ Ativar música';
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  if (!AudioCtx) { button.hidden = true; return; }
+
+  let ctx = null, master = null, timer = null, active = false, index = 0, generation = 0;
+  // Pequena progressão harmônica original: notas curtas, graves e macias.
+  const sequence = [
+    [196, 261.63], [246.94], [293.66], [261.63],
+    [174.61, 220], [261.63], [293.66], [220],
+    [164.81, 196], [246.94], [261.63], [196],
+    [174.61, 261.63], [220], [196], [146.83]
+  ];
+
+  function label() {
+    button.setAttribute('aria-pressed', String(active));
+    button.setAttribute('aria-label', active ? 'Desligar música ambiente' : 'Ligar música ambiente');
+    button.textContent = active ? '♫ Música: ligada' : '♫ Ativar música';
   }
-  function initialize() {
-    ctx = new AudioContextClass();
+  function setup() {
+    ctx = new AudioCtx();
     master = ctx.createGain();
-    master.gain.value = 0;
-    const lowpass = ctx.createBiquadFilter();
-    lowpass.type = 'lowpass'; lowpass.frequency.value = 650; lowpass.Q.value = 0.4;
-    lowpass.connect(master); master.connect(ctx.destination);
-    voices = chords[0].map((freq, index) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = index === 1 ? 'sine' : 'triangle';
-      osc.frequency.value = freq;
-      gain.gain.value = index === 0 ? 0.25 : 0.14;
-      osc.connect(gain); gain.connect(lowpass); osc.start();
-      return osc;
-    });
+    master.gain.value = 0.32;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 850;
+    filter.Q.value = 0.25;
+    filter.connect(master);
+    master.connect(ctx.destination);
+    return filter;
   }
-  function evolve() {
-    if (!ctx || !playing) return;
-    step = (step + 1) % chords.length;
-    const now = ctx.currentTime;
-    voices.forEach((osc, i) => osc.frequency.setTargetAtTime(chords[step][i], now, 2.8));
+  let filter;
+  function note(freq, when, duration, strength) {
+    if (!ctx) return;
+    const oscillator = ctx.createOscillator();
+    const envelope = ctx.createGain();
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(freq, when);
+    envelope.gain.setValueAtTime(0.0001, when);
+    envelope.gain.exponentialRampToValueAtTime(strength, when + 0.12);
+    envelope.gain.exponentialRampToValueAtTime(0.0001, when + duration);
+    oscillator.connect(envelope);
+    envelope.connect(filter);
+    oscillator.start(when);
+    oscillator.stop(when + duration + 0.03);
+    oscillator.onended = () => { oscillator.disconnect(); envelope.disconnect(); };
+  }
+  function playStep() {
+    if (!active || !ctx || ctx.state !== 'running') return;
+    const now = ctx.currentTime + 0.025;
+    const pitches = sequence[index % sequence.length];
+    pitches.forEach((freq, i) => note(freq, now + i * 0.22, 1.65, i === 0 ? 0.075 : 0.035));
+    index += 1;
   }
   async function toggle() {
     button.disabled = true;
+    const request = ++generation;
     try {
-      if (!ctx) initialize();
-      if (playing) {
-        playing = false;
+      if (active) {
+        active = false;
         clearInterval(timer);
-        master.gain.setTargetAtTime(0, ctx.currentTime, 0.25);
-        // Suspend only after the fade-out; toggling on cancels the pending suspend.
-        const current = ctx;
-        window.setTimeout(() => { if (!playing && ctx === current) current.suspend().catch(() => {}); }, 1200);
+        timer = null;
+        if (ctx && ctx.state === 'running') await ctx.suspend();
       } else {
-        await ctx.resume();
-        playing = true;
-        master.gain.setTargetAtTime(0.035, ctx.currentTime, 1.3);
-        clearInterval(timer);
-        timer = window.setInterval(evolve, 9000);
+        if (!ctx) filter = setup();
+        await ctx.resume(); // Inicia apenas após toque do visitante.
+        if (request !== generation) return;
+        active = true;
+        playStep();
+        timer = setInterval(playStep, 2000);
       }
-    } catch (error) {
-      playing = false;
+    } catch (e) {
+      active = false;
       clearInterval(timer);
-      console.warn('Áudio ambiente indisponível:', error);
-    } finally { setLabel(); button.disabled = false; }
+      timer = null;
+      console.warn('Música ambiente indisponível:', e);
+    } finally { label(); button.disabled = false; }
   }
   button.addEventListener('click', toggle);
   document.addEventListener('visibilitychange', () => {
-    if (!ctx || !playing) return;
+    if (!ctx || !active) return;
     if (document.hidden) ctx.suspend().catch(() => {});
     else ctx.resume().catch(() => {});
   });
-  window.addEventListener('pagehide', () => { clearInterval(timer); if (ctx) ctx.close().catch(() => {}); }, {once:true});
-  setLabel();
+  window.addEventListener('pagehide', () => {
+    active = false;
+    clearInterval(timer);
+    if (ctx) ctx.close().catch(() => {});
+  }, {once:true});
+  label();
 })();
