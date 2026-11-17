@@ -1,0 +1,1 @@
+{"name":"carol-digital-studio-ia","version":"1.0.0","private":true,"type":"module","scripts":{"start":"node server.js","check":"node --check server.js && node --check carol-ia.js"},"dependencies":{"express":"^4.21.2","helmet":"^8.0.0","express-rate-limit":"^7.5.0","@supabase/supabase-js":"^2.49.1"},"engines":{"node":">=20"}}
