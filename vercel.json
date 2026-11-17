@@ -32,6 +32,14 @@
     {
       "src": "videoplayback (1).mp4",
       "use": "@vercel/static"
+    },
+    {
+      "src": "robots.txt",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "sitemap.xml",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
