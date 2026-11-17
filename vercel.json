@@ -22,6 +22,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "welcome-voice.js",
+      "use": "@vercel/static"
+    },
+    {
       "src": "*.jpg",
       "use": "@vercel/static"
     }
