@@ -22,10 +22,6 @@
       "use": "@vercel/static"
     },
     {
-      "src": "ambient-music.js",
-      "use": "@vercel/static"
-    },
-    {
       "src": "*.jpg",
       "use": "@vercel/static"
     }
