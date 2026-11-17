@@ -112,6 +112,23 @@ document.getElementById('flow-detail').addEventListener('click',function(){const
 @media(max-height:620px){.ai-window{height:calc(100dvh - 90px)}}
 </style>
 <style id="portfolio-gallery-styles">.project-gallery{display:flex;gap:10px;margin:14px 0}.project-gallery-thumb{width:96px;height:76px;padding:4px;border:1px solid #00e5d4;background:#103849;border-radius:10px;overflow:hidden}.project-gallery-thumb img{width:100%;height:100%;object-fit:cover;border-radius:6px}.project-similar{width:100%;margin-top:10px}.modal .dialog{max-height:90dvh;overflow-y:auto}.modal #modal-img{cursor:zoom-in;transition:transform .2s ease}.modal #modal-img.project-zoomed{object-fit:contain;max-height:none;height:auto;width:100%;cursor:zoom-out}.flow-actions{flex-wrap:wrap}@media(max-width:640px){.flow-actions .btn{font-size:12px;padding:10px}.project-gallery-thumb{width:82px;height:66px}}</style>
+<style id="ai-scroll-fix">
+/* The conversation is the only flexible scrolling region. */
+.ai-window{min-height:0}
+.ai-window .ai-head,.ai-window .ai-actions,.ai-window .ai-guidance,.ai-window .ai-quote-trigger,.ai-window .ai-compose,.ai-window .ai-notice{flex-shrink:0}
+.ai-window .ai-messages{flex:1 1 0;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#327e7c transparent;-webkit-overflow-scrolling:touch}
+.ai-window .ai-msg{flex:0 0 auto;min-height:min-content;overflow-wrap:anywhere}
+@media(max-width:640px){
+.ai-window{height:min(600px,calc(100dvh - 94px));max-height:calc(100dvh - 94px)}
+.ai-window .ai-messages{min-height:110px}
+.ai-window .ai-guidance{gap:2px}
+.ai-window .ai-quote.show{max-height:48%;overflow-y:auto}
+}
+@media(max-height:640px){
+.ai-window .ai-guidance{display:none}
+.ai-window .ai-messages{min-height:75px}
+}
+</style>
 <button class="ai-launch" id="ai-launch" aria-label="Conversar com Carol IA" aria-expanded="false" aria-controls="ai-window"><img src="carol.jpg" alt="Carol"/><span class="ai-launch-dot" aria-hidden="true"></span></button>
 <section class="ai-window" id="ai-window" role="dialog" aria-label="Atendimento Carol IA" aria-modal="false" aria-hidden="true">
  <div class="ai-head"><img src="carol.jpg" alt="Foto de Carol"/><div class="ai-head-title"><strong>Carol IA <span class="ai-sparkle">✦</span></strong><small>Assistente de projetos digitais</small></div><button id="ai-close" aria-label="Fechar conversa" type="button">×</button></div>
