@@ -40,6 +40,10 @@
     {
       "src": "sitemap.xml",
       "use": "@vercel/static"
+    },
+    {
+      "src": "cliente.html",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
