@@ -23,5 +23,43 @@ const nome=clean(req.body?.nome,100),email=clean(req.body?.email,180),empresa=cl
 async function admin(req,res,next){if(!supabase)return fail(res,'Banco não configurado');const token=(req.headers.authorization||'').replace(/^Bearer /,'');if(!token)return fail(res,'Acesso não autorizado',401);const {data,error}=await supabase.auth.getUser(token);if(error||!data?.user||data.user.email?.toLowerCase()!==process.env.ADMIN_EMAIL?.toLowerCase())return fail(res,'Acesso não autorizado',403);next()}
 app.get('/api/admin/leads',adminLimit,admin,async(req,res)=>{const {data,error}=await supabase.from('carol_leads').select('id,protocol,nome,email,empresa,servico,ideia,conversation,status,preco_final,resposta,created_at').order('created_at',{ascending:false}).limit(150);if(error)return fail(res,'Erro ao carregar pedidos',500);res.json({leads:data})});
 app.patch('/api/admin/leads/:id',adminLimit,admin,async(req,res)=>{const allowed=['aguardando_orcamento','em_analise','proposta_pronta','concluido'];const status=clean(req.body.status,40),resposta=clean(req.body.resposta,4000),preco=req.body.preco_final;if(!allowed.includes(status)||preco!==null&&preco!==undefined&&(!Number.isFinite(Number(preco))||Number(preco)<0))return fail(res,'Dados inválidos',400);const {data,error}=await supabase.from('carol_leads').update({status,resposta,preco_final:preco===null||preco===undefined?null:Number(preco)}).eq('id',req.params.id).select('id,protocol,status,preco_final,resposta').single();if(error)return fail(res,'Erro ao atualizar',500);res.json({lead:data})});
+const bearer=req=>(req.headers.authorization||'').match(/^Bearer\\s+(.+)$/i)?.[1]||'';
+async function clientAuth(req,res,next){
+ if(!supabase)return fail(res,'Serviço indisponível');
+ const token=bearer(req);if(!token)return fail(res,'Entre na sua conta para continuar.',401);
+ const {data,error}=await supabase.auth.getUser(token);
+ if(error||!data?.user||!data.user.email_confirmed_at)return fail(res,'Sessão inválida ou e-mail não confirmado.',401);
+ req.clientUser=data.user;next();
+}
+app.get('/api/client/projects',adminLimit,clientAuth,async(req,res)=>{
+ const {data:links,error:linkError}=await supabase.from('carol_client_access').select('lead_id').eq('user_id',req.clientUser.id).limit(100);
+ if(linkError)return fail(res,'Não foi possível consultar seus projetos.',500);
+ if(!links?.length)return res.json({projects:[]});
+ const {data,error}=await supabase.from('carol_leads').select('id,protocol,servico,ideia,status,preco_final,resposta,created_at').in('id',links.map(x=>x.lead_id)).order('created_at',{ascending:false});
+ if(error)return fail(res,'Não foi possível carregar seus projetos.',500);
+ return res.json({projects:data||[]});
+});
+app.post('/api/admin/client-access',adminLimit,admin,async(req,res)=>{
+ const userId=clean(req.body?.user_id,36),leadId=clean(req.body?.lead_id,36);
+ const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+ if(!uuid.test(userId)||!uuid.test(leadId))return fail(res,'IDs inválidos.',400);
+ const [{data:auth,error:authError},{data:lead,error:leadError}]=await Promise.all([
+  supabase.auth.admin.getUserById(userId),
+  supabase.from('carol_leads').select('id,email').eq('id',leadId).maybeSingle()
+ ]);
+ if(authError||leadError||!auth?.user||!lead)return fail(res,'Cliente ou solicitação não encontrado.',404);
+ if(!auth.user.email_confirmed_at||!lead.email||auth.user.email?.trim().toLowerCase()!==lead.email.trim().toLowerCase())return fail(res,'O e-mail confirmado do cliente precisa ser igual ao e-mail da solicitação.',403);
+ const {error}=await supabase.from('carol_client_access').upsert({user_id:userId,lead_id:leadId},{onConflict:'user_id,lead_id'});
+ if(error)return fail(res,'Não foi possível autorizar o acesso.',500);
+ return res.status(201).json({linked:true});
+});
+app.delete('/api/admin/client-access',adminLimit,admin,async(req,res)=>{
+ const userId=clean(req.body?.user_id,36),leadId=clean(req.body?.lead_id,36);
+ const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+ if(!uuid.test(userId)||!uuid.test(leadId))return fail(res,'IDs inválidos.',400);
+ const {error}=await supabase.from('carol_client_access').delete().eq('user_id',userId).eq('lead_id',leadId);
+ if(error)return fail(res,'Não foi possível revogar o acesso.',500);
+ return res.json({revoked:true});
+});
 app.use(express.static(root,{index:'index.html',extensions:['html']}));if(!process.env.VERCEL)app.listen(process.env.PORT||3000,()=>console.log('Carol Digital Studio ativo na porta '+(process.env.PORT||3000)));
 export default app;
