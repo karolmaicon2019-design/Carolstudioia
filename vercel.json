@@ -28,6 +28,10 @@
     {
       "src": "*.jpg",
       "use": "@vercel/static"
+    },
+    {
+      "src": "videoplayback (1).mp4",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
