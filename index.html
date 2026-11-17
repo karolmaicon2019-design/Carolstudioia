@@ -114,4 +114,13 @@ document.getElementById('flow-detail').addEventListener('click',function(){const
 @media(prefers-reduced-motion:reduce){.ai-launch,.ai-window.open{animation:none!important}}
 </style>
 <script src="/carol-ia.js" defer></script>
+
+<style>
+#ambient-toggle{position:fixed;left:14px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:80;border:1px solid #00e5d477;background:#082c38ee;color:#c8fff9;border-radius:999px;padding:9px 13px;font:600 12px/1.2 system-ui,sans-serif;box-shadow:0 4px 18px #0007;cursor:pointer;backdrop-filter:blur(10px)}
+#ambient-toggle[aria-pressed="true"]{border-color:#00e5d4;color:#00e5d4}
+#ambient-toggle:focus-visible{outline:2px solid #00e5d4;outline-offset:3px}
+@media(max-width:640px){#ambient-toggle{left:10px;bottom:calc(14px + env(safe-area-inset-bottom,0px));padding:9px 11px;font-size:11px}}
+</style>
+<button type="button" id="ambient-toggle" aria-pressed="false" aria-label="Ligar música ambiente">♫ Ativar música</button>
+<script src="/ambient-music.js" defer></script>
 </body></html>
