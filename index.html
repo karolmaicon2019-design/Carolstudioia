@@ -137,17 +137,22 @@ document.getElementById('flow-detail').addEventListener('click',function(){const
 @keyframes introAppear{from{opacity:0;transform:translateY(25px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){#welcome-intro:before,#welcome-intro:after,.welcome-symbol,.welcome-content{animation:none}}
 </style>
-<div id="welcome-intro" role="dialog" aria-modal="true" aria-label="Boas-vindas ao Carol Digital Studio">
-  <div class="welcome-content">
-    <div class="welcome-symbol" aria-hidden="true">C✦</div>
-    <div class="welcome-eyebrow">Bem-vindo ao futuro digital</div>
-    <h2 class="welcome-title">Carol <span>Digital Studio</span></h2>
-    <p class="welcome-desc">Aqui suas ideias ganham vida.<br>Conheça nossos projetos e conte com a Carol IA para ajudar você.</p>
-    <div class="welcome-actions">
-      <button type="button" id="welcome-sound">♫ Ouvir boas-vindas</button>
-      <button type="button" id="welcome-skip">Entrar no site / Pular</button>
+<div id="welcome-intro" role="dialog" aria-modal="true" aria-label="Vídeo de boas-vindas ao Carol Digital Studio">
+  <div class="welcome-video-shell">
+    <video id="welcome-video" playsinline autoplay preload="auto" aria-label="Carol dando boas-vindas" src="/videoplayback%20(1).mp4"></video>
+    <div class="welcome-video-actions">
+      <button type="button" id="welcome-sound">Ativar som e assistir</button>
+      <button type="button" id="welcome-skip">Pular apresentação</button>
     </div>
   </div>
 </div>
+<style>
+#welcome-intro{background:#061923}
+#welcome-intro:before,#welcome-intro:after{display:none}
+.welcome-video-shell{position:relative;z-index:2;width:min(100vw,1200px);max-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:12px;box-sizing:border-box}
+#welcome-video{display:block;width:100%;max-height:calc(100dvh - 90px);aspect-ratio:16/9;object-fit:contain;border-radius:14px;background:#020b10;box-shadow:0 0 55px #00e5d41c}
+.welcome-video-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:12px}
+@media(max-width:640px){.welcome-video-shell{padding:8px}#welcome-video{border-radius:9px;max-height:calc(100dvh - 110px)}}
+</style>
 <script src="/welcome-intro.js" defer></script>
 </body></html>
