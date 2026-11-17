@@ -13,4 +13,5 @@ for(const p of ['index.html','admin.html','cliente.html','carol-ia.js','robots.t
 const inline=[...home.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(m=>m[1]).filter(x=>!x.trim().startsWith('{'));
 for(const [i,js] of inline.entries()){const {Script}=await import('node:vm');new Script(js,{filename:'index-inline-'+i+'.js'});}
 const adminScript=admin.match(/<script type="module">([\s\S]*?)<\/script>/)?.[1];assert.ok(adminScript);assert.match(adminScript,/function render/);
-const portalScript=portal.match(/<script type="module">([\s\S]*?)<\/script>/)?.[1];assert.ok(portalScript);new (await import('node:vm')).Script(portalScript.replace(/^import\{createClient\}from'[^']+';/,''));\nconsole.log('Static smoke checks passed. Live API/auth tests require production credentials and two test accounts.');
+const portalScript=portal.match(/<script type="module">([\s\S]*?)<\/script>/)?.[1];assert.ok(portalScript);new (await import('node:vm')).Script(portalScript.replace(/^import\{createClient\}from'[^']+';/,''));
+console.log('Static smoke checks passed. Live API/auth tests require production credentials and two test accounts.');
