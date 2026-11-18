@@ -30,6 +30,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "*.svg",
+      "use": "@vercel/static"
+    },
+    {
       "src": "videoplayback (1).mp4",
       "use": "@vercel/static"
     },
