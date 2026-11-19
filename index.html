@@ -279,6 +279,14 @@
 }
 @media(max-width:350px){.mobile-project-visual{height:200px!important}.mobile-project-phone{width:min(53%,132px)!important}.mobile-project-body{padding:16px 12px!important;gap:8px!important}.mobile-project-body>.btn{font-size:.72rem!important}}
 
+/* Screen-like previews: crop captured browser controls inside a realistic phone bezel. */
+@media(max-width:700px){
+ .mobile-project-visual{height:252px!important}
+ .mobile-project-phone{width:min(62%,177px)!important;height:100%!important;padding:5px!important;overflow:hidden!important;border:3px solid #397d85!important;border-radius:23px!important;background:#071923!important;box-shadow:0 15px 32px #000b,0 0 0 4px #00e5d40b,inset 0 0 0 1px #ffffff25!important;transform:perspective(700px) rotateY(-3deg)!important}
+ .mobile-project-phone:before{content:"";position:absolute;top:3px;left:50%;transform:translateX(-50%);width:28%;height:5px;border-radius:0 0 8px 8px;background:#061923;z-index:3;pointer-events:none}
+ .mobile-project-card .mobile-project-phone>img{width:100%!important;height:100%!important;object-fit:cover!important;object-position:center 49%!important;border-radius:16px!important;display:block!important;transform:scale(1.12)!important;transform-origin:center center!important;filter:contrast(1.04) saturate(1.05)!important}
+ .mobile-project-card.mobile-is-active .mobile-project-phone{animation:none!important}
+}
 /* Chat viewport: scrollable conversation and controls without clipping on phones. */
 @media(max-width:640px){
  .ai-window{box-sizing:border-box!important;top:max(74px,env(safe-area-inset-top,0px))!important;bottom:max(12px,env(safe-area-inset-bottom,0px))!important;height:auto!important;max-height:none!important;display:none;overflow:hidden!important}
