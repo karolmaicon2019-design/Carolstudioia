@@ -227,6 +227,34 @@
 }
 @media(prefers-reduced-motion:reduce){.mobile-project-progress span{transition:none!important}}
 
+/* Editorial premium mobile showcase — richer visual hierarchy without changing carousel behavior. */
+@media(max-width:700px){
+ .mobile-project-gallery{gap:14px!important;perspective:1100px}
+ .mobile-project-nav{margin:0 2px 6px!important}
+ .mobile-project-nav button{border-radius:16px!important;width:52px!important;height:48px!important;background:linear-gradient(150deg,#145060,#082630)!important;border:1px solid #337e86!important;box-shadow:0 7px 18px #0005,inset 0 1px #ffffff23!important}
+ .mobile-project-position>span{font-size:1rem!important;font-weight:800!important;letter-spacing:.21em!important;color:#e5ffff!important}
+ .mobile-project-progress{width:142px!important}
+ .mobile-project-card{border-radius:26px!important;overflow:hidden!important;background:#092733!important;border:1px solid #32727b!important;box-shadow:0 24px 55px #0009,0 0 0 1px #00e5d412!important}
+ .mobile-project-visual{height:315px!important;padding:20px 14px!important;background:radial-gradient(ellipse at 50% 38%,#1c6972 0%,#0d3a49 39%,#061923 82%)!important;isolation:isolate}
+ .mobile-project-visual:before{inset:22px 11%!important;border:1px solid #62c8c52c!important;border-radius:34px!important;box-shadow:0 0 0 17px #00e5d405!important}
+ .mobile-project-visual:after{bottom:5px!important;left:25%!important;right:25%!important;height:25px!important;background:#00e5d442!important;filter:blur(23px)!important}
+ .mobile-project-phone{width:min(65%,194px)!important;height:98%!important;border:3px solid #357985!important;border-radius:25px!important;padding:7px!important;background:#061923!important;box-shadow:0 20px 32px #0009,inset 0 0 0 1px #ffffff30,0 0 0 5px #00e5d40a!important;transform:rotateY(-5deg) rotateX(2deg)}
+ .mobile-project-card.mobile-is-active .mobile-project-phone{box-shadow:0 20px 32px #0009,inset 0 0 0 1px #ffffff30,0 0 0 5px #00e5d40a,0 0 34px #00e5d425!important}
+ .mobile-project-card .mobile-project-phone>img{border-radius:17px!important}
+ .mobile-project-body{position:relative;padding:24px 22px 28px!important;gap:14px!important;background:linear-gradient(150deg,#103946 0%,#092b38 48%,#071f2c 100%)!important;border-top:1px solid #ffffff13}
+ .mobile-project-body:before{content:"";position:absolute;left:22px;top:0;width:54px;height:3px;border-radius:0 0 8px 8px;background:#00e5d4;box-shadow:0 0 18px #00e5d470}
+ .mobile-project-body .eyebrow{color:#69e7dd!important;font-size:.69rem!important;font-weight:800!important;letter-spacing:.19em!important}
+ .mobile-project-body h3{font-size:clamp(1.65rem,7vw,2.1rem)!important;font-weight:800!important;letter-spacing:-.04em!important;line-height:1.12!important;color:#f4ffff!important}
+ .mobile-project-body .status{display:inline-flex!important;align-items:center!important;width:fit-content!important;padding:7px 12px!important;border-radius:100px!important;background:#c6a96b12!important;border:1px solid #d4b47775!important;color:#f2d6a1!important;font-size:.77rem!important;letter-spacing:.02em}
+ .mobile-project-body p{font-size:.95rem!important;line-height:1.6!important;color:#bfd2d7!important;margin-bottom:3px!important}
+ .mobile-project-body .btn{width:100%!important;min-height:51px!important;border-radius:14px!important;font-size:.95rem!important;font-weight:750!important;letter-spacing:.005em!important;box-shadow:0 7px 17px #0003!important}
+ .mobile-project-body a.btn{background:linear-gradient(110deg,#00dfd1,#29f0d9)!important;color:#06242b!important;border:1px solid #61fff0!important}
+ .mobile-project-body button.btn.ghost{background:#ffffff06!important;border:1px solid #43808b!important;color:#e8fbfc!important}
+}
+@media(max-width:380px){.mobile-project-visual{height:285px!important}.mobile-project-phone{width:min(66%,177px)!important}.mobile-project-body{padding:21px 17px 25px!important}}
+@media(max-width:700px) and (prefers-reduced-motion:no-preference){.mobile-project-card.mobile-is-active .mobile-project-phone{animation:premiumPhoneIn .6s cubic-bezier(.16,1,.3,1) both}}
+@media(prefers-reduced-motion:reduce){.mobile-project-phone{transform:none!important}}
+
 /* Chat viewport: scrollable conversation and controls without clipping on phones. */
 @media(max-width:640px){
  .ai-window{box-sizing:border-box!important;top:max(74px,env(safe-area-inset-top,0px))!important;bottom:max(12px,env(safe-area-inset-bottom,0px))!important;height:auto!important;max-height:none!important;display:none;overflow:hidden!important}
