@@ -338,6 +338,15 @@ document.getElementById('flow-detail').addEventListener('click',function(){const
 .ai-quote{position:absolute;inset:65px 0 0;z-index:5;overflow:auto!important;padding:17px!important;background:#092733!important;border-top:1px solid #397a80;display:none!important}.ai-quote.show{display:block!important}.ai-quote-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.ai-quote-heading strong{font-size:17px}.ai-quote-heading button{width:32px!important;margin:0!important;background:transparent!important;color:#fff!important;font-size:24px!important;padding:0!important}.ai-quote p{font-size:12px;color:#b9d3d5;line-height:1.5;margin-bottom:14px}.ai-quote label{font-size:12px!important;margin-bottom:12px!important}.ai-quote input{font-size:14px!important;padding:11px!important;margin-top:6px!important}.ai-quote #ai-save{padding:13px!important}.ai-quote small{line-height:1.5}
 @keyframes carolAttention{0%,75%,100%{transform:translateY(0)}81%{transform:translateY(-4px)}88%{transform:translateY(0)}}@keyframes carolOpen{from{opacity:0;transform:translateY(9px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-width:640px){.ai-window{right:8px!important;width:calc(100vw - 16px)!important;bottom:calc(80px + env(safe-area-inset-bottom,0px))!important;height:min(510px,calc(100dvh - 104px))!important}.ai-launch{right:12px!important;bottom:calc(14px + env(safe-area-inset-bottom,0px))!important}}
+
+/* Mobile chat: keep header flush to top, messages readable and scrollable. */
+@media(max-width:640px){
+.ai-window.open{display:flex!important;flex-direction:column!important;justify-content:flex-start!important;align-items:stretch!important;padding:0!important;gap:0!important;top:auto!important;bottom:calc(12px + env(safe-area-inset-bottom,0px))!important;height:min(690px,calc(100dvh - 90px))!important;max-height:calc(100dvh - 90px)!important}
+.ai-window .ai-head{margin:0!important;min-height:65px!important;flex:0 0 auto!important}
+.ai-window .ai-messages{flex:1 1 0!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;justify-content:flex-start!important;align-content:start!important}
+.ai-window .ai-actions,.ai-window .ai-guidance,.ai-window .ai-quote-trigger,.ai-window .ai-compose,.ai-window .ai-notice{flex-shrink:0!important}
+.ai-window .ai-msg{white-space:pre-wrap!important;overflow-wrap:anywhere!important;flex-shrink:0!important}
+}
 @media(prefers-reduced-motion:reduce){.ai-launch,.ai-window.open{animation:none!important}}
 </style>
 <script src="/carol-ia.js" defer></script>
